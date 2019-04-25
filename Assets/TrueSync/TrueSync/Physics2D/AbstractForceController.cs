@@ -1,197 +1,157 @@
-﻿namespace TrueSync.Physics2D
-{
-    using Microsoft.Xna.Framework;
-    using System;
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-    using TrueSync;
+﻿// Decompiled with JetBrains decompiler
+// Type: TrueSync.Physics2D.AbstractForceController
+// Assembly: TrueSync, Version=0.1.0.6, Culture=neutral, PublicKeyToken=null
+// MVID: 11931B28-7678-4A75-941C-C3C4D965272F
+// Assembly location: D:\Photon-TrueSync-Experiments\Assets\Plugins\TrueSync.dll
 
+using Microsoft.Xna.Framework;
+
+namespace TrueSync.Physics2D
+{
     public abstract class AbstractForceController : Controller
     {
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <DecayEnd>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private DecayModes <DecayMode>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <DecayStart>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <ImpulseLength>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <ImpulseTime>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <MaximumForce>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <MaximumSpeed>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private TSVector2 <Position>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <Strength>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private TimingModes <TimingMode>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool <Triggered>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <Variation>k__BackingField;
         public Curve DecayCurve;
-        public ForceTypes ForceType;
+        public AbstractForceController.ForceTypes ForceType;
         protected TSRandom Randomize;
         public Curve StrengthCurve;
 
-        public AbstractForceController() : base(ControllerType.AbstractForceController)
+        public AbstractForceController()
+          : base(ControllerType.AbstractForceController)
         {
-            base.Enabled = true;
-            this.Strength = 1f;
-            this.Position = new TSVector2(0, 0);
-            this.MaximumSpeed = 100f;
-            this.TimingMode = TimingModes.Switched;
-            this.ImpulseTime = 0f;
-            this.ImpulseLength = 1f;
+            this.Enabled = true;
+            this.Strength = (FP)1f;
+            this.Position = new TSVector2((FP)0, (FP)0);
+            this.MaximumSpeed = (FP)100f;
+            this.TimingMode = AbstractForceController.TimingModes.Switched;
+            this.ImpulseTime = (FP)0.0f;
+            this.ImpulseLength = (FP)1f;
             this.Triggered = false;
             this.StrengthCurve = new Curve();
-            this.Variation = 0f;
-            this.Randomize = TSRandom.New(0x4d2);
-            this.DecayMode = DecayModes.None;
+            this.Variation = (FP)0.0f;
+            this.Randomize = TSRandom.New(1234);
+            this.DecayMode = AbstractForceController.DecayModes.None;
             this.DecayCurve = new Curve();
-            this.DecayStart = 0f;
-            this.DecayEnd = 0f;
-            this.StrengthCurve.Keys.Add(new CurveKey(0, 5));
-            this.StrengthCurve.Keys.Add(new CurveKey(0.1f, 5));
-            this.StrengthCurve.Keys.Add(new CurveKey(0.2f, -4));
-            this.StrengthCurve.Keys.Add(new CurveKey(1f, 0));
+            this.DecayStart = (FP)0.0f;
+            this.DecayEnd = (FP)0.0f;
+            this.StrengthCurve.Keys.Add(new CurveKey((FP)0, (FP)5));
+            this.StrengthCurve.Keys.Add(new CurveKey((FP)0.1f, (FP)5));
+            this.StrengthCurve.Keys.Add(new CurveKey((FP)0.2f, (FP) - 4));
+            this.StrengthCurve.Keys.Add(new CurveKey((FP)1f, (FP)0));
         }
 
-        public AbstractForceController(TimingModes mode) : base(ControllerType.AbstractForceController)
+        public AbstractForceController(AbstractForceController.TimingModes mode)
+          : base(ControllerType.AbstractForceController)
         {
             this.TimingMode = mode;
             switch (mode)
             {
-                case TimingModes.Switched:
-                    base.Enabled = true;
+                case AbstractForceController.TimingModes.Switched:
+                    this.Enabled = true;
                     break;
-
-                case TimingModes.Triggered:
-                    base.Enabled = false;
+                case AbstractForceController.TimingModes.Triggered:
+                    this.Enabled = false;
                     break;
-
-                case TimingModes.Curve:
-                    base.Enabled = false;
+                case AbstractForceController.TimingModes.Curve:
+                    this.Enabled = false;
                     break;
             }
         }
 
-        public abstract void ApplyForce(FP dt, FP strength);
+        public FP Strength { get; set; }
+
+        public TSVector2 Position { get; set; }
+
+        public FP MaximumSpeed { get; set; }
+
+        public FP MaximumForce { get; set; }
+
+        public AbstractForceController.TimingModes TimingMode { get; set; }
+
+        public FP ImpulseTime { get; private set; }
+
+        public FP ImpulseLength { get; set; }
+
+        public bool Triggered { get; private set; }
+
+        public FP Variation { get; set; }
+
+        public AbstractForceController.DecayModes DecayMode { get; set; }
+
+        public FP DecayStart { get; set; }
+
+        public FP DecayEnd { get; set; }
+
         protected FP GetDecayMultiplier(Body body)
         {
-            TSVector2 vector = body.Position - this.Position;
-            FP magnitude = vector.magnitude;
+            FP magnitude = (body.Position - this.Position).magnitude;
             switch (this.DecayMode)
             {
-                case DecayModes.None:
-                    return 1f;
-
-                case DecayModes.Step:
-                    if (magnitude >= this.DecayEnd)
-                    {
-                        return 0f;
-                    }
-                    return 1f;
-
-                case DecayModes.Linear:
-                    if (magnitude >= this.DecayStart)
-                    {
-                        if (magnitude > this.DecayEnd)
-                        {
-                            return 0f;
-                        }
-                        return ((this.DecayEnd - (this.DecayStart / magnitude)) - this.DecayStart);
-                    }
-                    return 1f;
-
-                case DecayModes.InverseSquare:
-                    if (magnitude >= this.DecayStart)
-                    {
-                        return (1f / ((magnitude - this.DecayStart) * (magnitude - this.DecayStart)));
-                    }
-                    return 1f;
-
-                case DecayModes.Curve:
-                    if (magnitude >= this.DecayStart)
-                    {
-                        return this.DecayCurve.Evaluate(magnitude - this.DecayStart);
-                    }
-                    return 1f;
+                case AbstractForceController.DecayModes.None:
+                    return (FP)1f;
+                case AbstractForceController.DecayModes.Step:
+                    if (magnitude < this.DecayEnd)
+                        return (FP)1f;
+                    return (FP)0.0f;
+                case AbstractForceController.DecayModes.Linear:
+                    if (magnitude < this.DecayStart)
+                        return (FP)1f;
+                    if (magnitude > this.DecayEnd)
+                        return (FP)0.0f;
+                    return this.DecayEnd - this.DecayStart / magnitude - this.DecayStart;
+                case AbstractForceController.DecayModes.InverseSquare:
+                    if (magnitude < this.DecayStart)
+                        return (FP)1f;
+                    return (FP)1f / ((magnitude - this.DecayStart) * (magnitude - this.DecayStart));
+                case AbstractForceController.DecayModes.Curve:
+                    if (magnitude < this.DecayStart)
+                        return (FP)1f;
+                    return this.DecayCurve.Evaluate(magnitude - this.DecayStart);
+                default:
+                    return (FP)1f;
             }
-            return 1f;
         }
 
         public void Trigger()
         {
             this.Triggered = true;
-            this.ImpulseTime = 0;
+            this.ImpulseTime = (FP)0;
         }
 
         public override void Update(FP dt)
         {
             switch (this.TimingMode)
             {
-                case TimingModes.Switched:
-                    if (base.Enabled)
+                case AbstractForceController.TimingModes.Switched:
+                    if (!this.Enabled)
+                        break;
+                    this.ApplyForce(dt, this.Strength);
+                    break;
+                case AbstractForceController.TimingModes.Triggered:
+                    if (!this.Enabled || !this.Triggered)
+                        break;
+                    if (this.ImpulseTime < this.ImpulseLength)
                     {
                         this.ApplyForce(dt, this.Strength);
+                        this.ImpulseTime = this.ImpulseTime + dt;
                     }
+                    else
+                        this.Triggered = false;
                     break;
-
-                case TimingModes.Triggered:
-                    if (base.Enabled && this.Triggered)
+                case AbstractForceController.TimingModes.Curve:
+                    if (!this.Enabled || !this.Triggered)
+                        break;
+                    if (this.ImpulseTime < this.ImpulseLength)
                     {
-                        if (this.ImpulseTime >= this.ImpulseLength)
-                        {
-                            this.Triggered = false;
-                            break;
-                        }
-                        this.ApplyForce(dt, this.Strength);
-                        this.ImpulseTime += dt;
-                    }
-                    break;
-
-                case TimingModes.Curve:
-                    if (base.Enabled && this.Triggered)
-                    {
-                        if (this.ImpulseTime >= this.ImpulseLength)
-                        {
-                            this.Triggered = false;
-                            break;
-                        }
                         this.ApplyForce(dt, this.Strength * this.StrengthCurve.Evaluate(this.ImpulseTime));
-                        this.ImpulseTime += dt;
+                        this.ImpulseTime = this.ImpulseTime + dt;
                     }
+                    else
+                        this.Triggered = false;
                     break;
             }
         }
 
-        public FP DecayEnd { get; set; }
-
-        public DecayModes DecayMode { get; set; }
-
-        public FP DecayStart { get; set; }
-
-        public FP ImpulseLength { get; set; }
-
-        public FP ImpulseTime { get; private set; }
-
-        public FP MaximumForce { get; set; }
-
-        public FP MaximumSpeed { get; set; }
-
-        public TSVector2 Position { get; set; }
-
-        public FP Strength { get; set; }
-
-        public TimingModes TimingMode { get; set; }
-
-        public bool Triggered { get; private set; }
-
-        public FP Variation { get; set; }
+        public abstract void ApplyForce(FP dt, FP strength);
 
         public enum DecayModes
         {
@@ -199,22 +159,21 @@
             Step,
             Linear,
             InverseSquare,
-            Curve
+            Curve,
         }
 
         public enum ForceTypes
         {
             Point,
             Line,
-            Area
+            Area,
         }
 
         public enum TimingModes
         {
             Switched,
             Triggered,
-            Curve
+            Curve,
         }
     }
 }
-

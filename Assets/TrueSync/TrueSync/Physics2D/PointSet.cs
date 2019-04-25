@@ -1,20 +1,30 @@
-﻿namespace TrueSync.Physics2D
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
+﻿// Decompiled with JetBrains decompiler
+// Type: TrueSync.Physics2D.PointSet
+// Assembly: TrueSync, Version=0.1.0.6, Culture=neutral, PublicKeyToken=null
+// MVID: 11931B28-7678-4A75-941C-C3C4D965272F
+// Assembly location: D:\Photon-TrueSync-Experiments\Assets\Plugins\TrueSync.dll
 
+using System.Collections.Generic;
+
+namespace TrueSync.Physics2D
+{
     internal class PointSet : Triangulatable
     {
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private IList<TriangulationPoint> <Points>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private IList<DelaunayTriangle> <Triangles>k__BackingField;
-
         public PointSet(List<TriangulationPoint> points)
         {
-            this.Points = new List<TriangulationPoint>(points);
+            this.Points = (IList<TriangulationPoint>)new List<TriangulationPoint>((IEnumerable<TriangulationPoint>)points);
+        }
+
+        public IList<TriangulationPoint> Points { get; private set; }
+
+        public IList<DelaunayTriangle> Triangles { get; private set; }
+
+        public virtual TriangulationMode TriangulationMode
+        {
+            get
+            {
+                return TriangulationMode.Unconstrained;
+            }
         }
 
         public void AddTriangle(DelaunayTriangle t)
@@ -24,10 +34,8 @@
 
         public void AddTriangles(IEnumerable<DelaunayTriangle> list)
         {
-            foreach (DelaunayTriangle triangle in list)
-            {
-                this.Triangles.Add(triangle);
-            }
+            foreach (DelaunayTriangle delaunayTriangle in list)
+                this.Triangles.Add(delaunayTriangle);
         }
 
         public void ClearTriangles()
@@ -38,27 +46,10 @@
         public virtual void PrepareTriangulation(TriangulationContext tcx)
         {
             if (this.Triangles == null)
-            {
-                this.Triangles = new List<DelaunayTriangle>(this.Points.Count);
-            }
+                this.Triangles = (IList<DelaunayTriangle>)new List<DelaunayTriangle>(this.Points.Count);
             else
-            {
                 this.Triangles.Clear();
-            }
-            tcx.Points.AddRange(this.Points);
-        }
-
-        public IList<TriangulationPoint> Points { get; private set; }
-
-        public IList<DelaunayTriangle> Triangles { get; private set; }
-
-        public virtual TrueSync.Physics2D.TriangulationMode TriangulationMode
-        {
-            get
-            {
-                return TrueSync.Physics2D.TriangulationMode.Unconstrained;
-            }
+            tcx.Points.AddRange((IEnumerable<TriangulationPoint>)this.Points);
         }
     }
 }
-

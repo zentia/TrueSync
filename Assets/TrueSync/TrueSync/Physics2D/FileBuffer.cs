@@ -1,35 +1,25 @@
-﻿namespace TrueSync.Physics2D
-{
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Runtime.CompilerServices;
+﻿// Decompiled with JetBrains decompiler
+// Type: TrueSync.Physics2D.FileBuffer
+// Assembly: TrueSync, Version=0.1.0.6, Culture=neutral, PublicKeyToken=null
+// MVID: 11931B28-7678-4A75-941C-C3C4D965272F
+// Assembly location: D:\Photon-TrueSync-Experiments\Assets\Plugins\TrueSync.dll
 
+using System.IO;
+
+namespace TrueSync.Physics2D
+{
     internal class FileBuffer
     {
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private string <Buffer>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private int <Position>k__BackingField;
-
         public FileBuffer(Stream stream)
         {
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                this.Buffer = reader.ReadToEnd();
-            }
+            using (StreamReader streamReader = new StreamReader(stream))
+                this.Buffer = streamReader.ReadToEnd();
             this.Position = 0;
         }
 
         public string Buffer { get; set; }
 
-        public bool EndOfBuffer
-        {
-            get
-            {
-                return (this.Position == this.Length);
-            }
-        }
+        public int Position { get; set; }
 
         private int Length
         {
@@ -44,13 +34,17 @@
             get
             {
                 char ch = this.Buffer[this.Position];
-                int position = this.Position;
-                this.Position = position + 1;
+                this.Position = this.Position + 1;
                 return ch;
             }
         }
 
-        public int Position { get; set; }
+        public bool EndOfBuffer
+        {
+            get
+            {
+                return this.Position == this.Length;
+            }
+        }
     }
 }
-

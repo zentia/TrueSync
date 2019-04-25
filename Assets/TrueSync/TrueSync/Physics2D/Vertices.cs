@@ -1,370 +1,115 @@
-﻿namespace TrueSync.Physics2D
-{
-    using Microsoft.Xna.Framework;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-    using System.Text;
-    using TrueSync;
+﻿// Decompiled with JetBrains decompiler
+// Type: TrueSync.Physics2D.Vertices
+// Assembly: TrueSync, Version=0.1.0.6, Culture=neutral, PublicKeyToken=null
+// MVID: 11931B28-7678-4A75-941C-C3C4D965272F
+// Assembly location: D:\Photon-TrueSync-Experiments\Assets\Plugins\TrueSync.dll
 
+using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+
+namespace TrueSync.Physics2D
+{
     [DebuggerDisplay("Count = {Count} Vertices = {ToString()}")]
     public class Vertices : List<TSVector2>
     {
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private bool <AttachedToBody>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<Vertices> <Holes>k__BackingField;
-
         public Vertices()
+        {
+        }
+
+        public Vertices(int capacity)
+          : base(capacity)
         {
         }
 
         public Vertices(IEnumerable<TSVector2> vertices)
         {
-            base.AddRange(vertices);
+            this.AddRange(vertices);
         }
 
-        public Vertices(int capacity) : base(capacity)
+        internal bool AttachedToBody { get; set; }
+
+        public List<Vertices> Holes { get; set; }
+
+        public int NextIndex(int index)
         {
+            return index + 1 > this.Count - 1 ? 0 : index + 1;
         }
 
-        public PolygonError CheckPolygon()
+        public TSVector2 NextVertex(int index)
         {
-            if ((base.Count < 3) || (base.Count > Settings.MaxPolygonVertices))
-            {
-                return PolygonError.InvalidAmountOfVertices;
-            }
-            if (!this.IsSimple())
-            {
-                return PolygonError.NotSimple;
-            }
-            if (this.GetArea() <= Settings.Epsilon)
-            {
-                return PolygonError.AreaTooSmall;
-            }
-            if (!this.IsConvex())
-            {
-                return PolygonError.NotConvex;
-            }
-            for (int i = 0; i < base.Count; i++)
-            {
-                int num2 = ((i + 1) < base.Count) ? (i + 1) : 0;
-                TSVector2 vector = base[num2] - base[i];
-                if (vector.LengthSquared() <= Settings.EpsilonSqr)
-                {
-                    return PolygonError.SideTooSmall;
-                }
-            }
-            if (!this.IsCounterClockWise())
-            {
-                return PolygonError.NotCounterClockWise;
-            }
-            return PolygonError.NoError;
+            return this[this.NextIndex(index)];
         }
 
-        public void ForceCounterClockWise()
+        public int PreviousIndex(int index)
         {
-            if ((base.Count >= 3) && !this.IsCounterClockWise())
-            {
-                base.Reverse();
-            }
+            return index - 1 < 0 ? this.Count - 1 : index - 1;
         }
 
-        public AABB GetAABB()
+        public TSVector2 PreviousVertex(int index)
         {
-            AABB aabb;
-            TSVector2 vector = new TSVector2(FP.MaxValue, FP.MaxValue);
-            TSVector2 vector2 = new TSVector2(FP.MinValue, FP.MinValue);
-            for (int i = 0; i < base.Count; i++)
+            return this[this.PreviousIndex(index)];
+        }
+
+        public FP GetSignedArea()
+        {
+            if (this.Count < 3)
+                return (FP)0;
+            FP fp = (FP)0;
+            for (int index1 = 0; index1 < this.Count; ++index1)
             {
-                if (base[i].x < vector.x)
-                {
-                    vector.x = base[i].x;
-                }
-                if (base[i].x > vector2.x)
-                {
-                    vector2.x = base[i].x;
-                }
-                if (base[i].y < vector.y)
-                {
-                    vector.y = base[i].y;
-                }
-                if (base[i].y > vector2.y)
-                {
-                    vector2.y = base[i].y;
-                }
+                int index2 = (index1 + 1) % this.Count;
+                TSVector2 tsVector2_1 = this[index1];
+                TSVector2 tsVector2_2 = this[index2];
+                fp = fp + tsVector2_1.x * tsVector2_2.y - tsVector2_1.y * tsVector2_2.x;
             }
-            aabb.LowerBound = vector;
-            aabb.UpperBound = vector2;
-            return aabb;
+            return fp / (FP)2f;
         }
 
         public FP GetArea()
         {
             FP signedArea = this.GetSignedArea();
-            return ((signedArea < 0) ? -signedArea : signedArea);
+            return signedArea < (FP)0 ? -signedArea : signedArea;
         }
 
         public TSVector2 GetCentroid()
         {
-            if (base.Count < 3)
-            {
+            if (this.Count < 3)
                 return new TSVector2(FP.NaN, FP.NaN);
-            }
             TSVector2 zero = TSVector2.zero;
-            FP fp = 0f;
-            FP fp2 = 0.3333333f;
-            for (int i = 0; i < base.Count; i++)
+            FP fp1 = (FP)0.0f;
+            FP fp2 = (FP)0.3333333f;
+            for (int index = 0; index < this.Count; ++index)
             {
-                TSVector2 vector3 = base[i];
-                TSVector2 vector4 = ((i + 1) < base.Count) ? base[i + 1] : base[0];
-                FP fp3 = 0.5f * ((vector3.x * vector4.y) - (vector3.y * vector4.x));
-                fp += fp3;
-                zero += (fp3 * fp2) * (vector3 + vector4);
+                TSVector2 tsVector2_1 = this[index];
+                TSVector2 tsVector2_2 = index + 1 < this.Count ? this[index + 1] : this[0];
+                FP fp3 = (FP)0.5f * (tsVector2_1.x * tsVector2_2.y - tsVector2_1.y * tsVector2_2.x);
+                fp1 += fp3;
+                zero += fp3 * fp2 * (tsVector2_1 + tsVector2_2);
             }
-            return (TSVector2) (zero * (1f / fp));
+            return zero * ((FP)1f / fp1);
         }
 
-        public FP GetSignedArea()
+        public AABB GetAABB()
         {
-            if (base.Count < 3)
+            TSVector2 tsVector2_1 = new TSVector2(FP.MaxValue, FP.MaxValue);
+            TSVector2 tsVector2_2 = new TSVector2(FP.MinValue, FP.MinValue);
+            for (int index = 0; index < this.Count; ++index)
             {
-                return 0;
+                if (this[index].x < tsVector2_1.x)
+                    tsVector2_1.x = this[index].x;
+                if (this[index].x > tsVector2_2.x)
+                    tsVector2_2.x = this[index].x;
+                if (this[index].y < tsVector2_1.y)
+                    tsVector2_1.y = this[index].y;
+                if (this[index].y > tsVector2_2.y)
+                    tsVector2_2.y = this[index].y;
             }
-            FP fp = 0;
-            for (int i = 0; i < base.Count; i++)
-            {
-                int num2 = (i + 1) % base.Count;
-                TSVector2 vector = base[i];
-                TSVector2 vector2 = base[num2];
-                fp += vector.x * vector2.y;
-                fp -= vector.y * vector2.x;
-            }
-            return (fp / 2f);
-        }
-
-        public bool IsConvex()
-        {
-            if (base.Count < 3)
-            {
-                return false;
-            }
-            if (base.Count != 3)
-            {
-                for (int i = 0; i < base.Count; i++)
-                {
-                    int num2 = ((i + 1) < base.Count) ? (i + 1) : 0;
-                    TSVector2 vector = base[num2] - base[i];
-                    for (int j = 0; j < base.Count; j++)
-                    {
-                        if ((j != i) && (j != num2))
-                        {
-                            TSVector2 vector2 = base[j] - base[i];
-                            FP fp = (vector.x * vector2.y) - (vector.y * vector2.x);
-                            if (fp <= 0f)
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-
-        public bool IsCounterClockWise()
-        {
-            if (base.Count < 3)
-            {
-                return false;
-            }
-            return (this.GetSignedArea() > 0f);
-        }
-
-        public bool IsSimple()
-        {
-            if (base.Count < 3)
-            {
-                return false;
-            }
-            for (int i = 0; i < base.Count; i++)
-            {
-                TSVector2 vector = base[i];
-                TSVector2 vector2 = this.NextVertex(i);
-                for (int j = i + 1; j < base.Count; j++)
-                {
-                    TSVector2 vector5;
-                    TSVector2 vector3 = base[j];
-                    TSVector2 vector4 = this.NextVertex(j);
-                    if (LineTools.LineIntersect2(ref vector, ref vector2, ref vector3, ref vector4, out vector5))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        public int NextIndex(int index)
-        {
-            return (((index + 1) > (base.Count - 1)) ? 0 : (index + 1));
-        }
-
-        public TSVector2 NextVertex(int index)
-        {
-            return base[this.NextIndex(index)];
-        }
-
-        public int PointInPolygon(ref TSVector2 point)
-        {
-            int num = 0;
-            for (int i = 0; i < base.Count; i++)
-            {
-                TSVector2 a = base[i];
-                TSVector2 b = base[this.NextIndex(i)];
-                TSVector2 vector3 = b - a;
-                FP fp = MathUtils.Area(ref a, ref b, ref point);
-                if (((fp == 0f) && (TSVector2.Dot(point - a, vector3) >= 0f)) && (TSVector2.Dot(point - b, vector3) <= 0f))
-                {
-                    return 0;
-                }
-                if (a.y <= point.y)
-                {
-                    if ((b.y > point.y) && (fp > 0f))
-                    {
-                        num++;
-                    }
-                }
-                else if ((b.y <= point.y) && (fp < 0f))
-                {
-                    num--;
-                }
-            }
-            return ((num == 0) ? -1 : 1);
-        }
-
-        public bool PointInPolygonAngle(ref TSVector2 point)
-        {
-            FP fp = 0;
-            for (int i = 0; i < base.Count; i++)
-            {
-                TSVector2 vector = base[i] - point;
-                TSVector2 vector2 = base[this.NextIndex(i)] - point;
-                fp += MathUtils.VectorAngle(ref vector, ref vector2);
-            }
-            if (FP.Abs(fp) < FP.Pi)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public int PreviousIndex(int index)
-        {
-            return (((index - 1) < 0) ? (base.Count - 1) : (index - 1));
-        }
-
-        public TSVector2 PreviousVertex(int index)
-        {
-            return base[this.PreviousIndex(index)];
-        }
-
-        public void ProjectToAxis(ref TSVector2 axis, out FP min, out FP max)
-        {
-            FP fp = TSVector2.Dot(axis, base[0]);
-            min = fp;
-            max = fp;
-            for (int i = 0; i < base.Count; i++)
-            {
-                fp = TSVector2.Dot(base[i], axis);
-                if (fp < min)
-                {
-                    min = fp;
-                }
-                else if (fp > max)
-                {
-                    max = fp;
-                }
-            }
-        }
-
-        public void Rotate(FP value)
-        {
-            Debug.Assert(!this.AttachedToBody, "Rotating vertices that are used by a Body can result in unstable behavior.");
-            FP fp = FP.Cos(value);
-            FP fp2 = FP.Sin(value);
-            for (int i = 0; i < base.Count; i++)
-            {
-                TSVector2 vector = base[i];
-                base[i] = new TSVector2((vector.x * fp) + (vector.y * -fp2), (vector.x * fp2) + (vector.y * fp));
-            }
-            if ((this.Holes != null) && (this.Holes.Count > 0))
-            {
-                foreach (Vertices vertices in this.Holes)
-                {
-                    vertices.Rotate(value);
-                }
-            }
-        }
-
-        public void Scale(TSVector2 value)
-        {
-            this.Scale(ref value);
-        }
-
-        public void Scale(ref TSVector2 value)
-        {
-            Debug.Assert(!this.AttachedToBody, "Scaling vertices that are used by a Body can result in unstable behavior.");
-            for (int i = 0; i < base.Count; i++)
-            {
-                base[i] = TSVector2.Multiply(base[i], value);
-            }
-            if ((this.Holes != null) && (this.Holes.Count > 0))
-            {
-                foreach (Vertices vertices in this.Holes)
-                {
-                    vertices.Scale(ref value);
-                }
-            }
-        }
-
-        public override string ToString()
-        {
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < base.Count; i++)
-            {
-                builder.Append(base[i].ToString());
-                if (i < (base.Count - 1))
-                {
-                    builder.Append(" ");
-                }
-            }
-            return builder.ToString();
-        }
-
-        public void Transform(ref Matrix transform)
-        {
-            for (int i = 0; i < base.Count; i++)
-            {
-                base[i] = TSVector2.Transform(base[i], transform);
-            }
-            if ((this.Holes != null) && (this.Holes.Count > 0))
-            {
-                for (int j = 0; j < this.Holes.Count; j++)
-                {
-                    TSVector2[] vertices = this.Holes[j].ToArray();
-                    int index = 0;
-                    int length = vertices.Length;
-                    while (index < length)
-                    {
-                        vertices[index] = TSVector2.Transform(vertices[index], transform);
-                        index++;
-                    }
-                    this.Holes[j] = new Vertices(vertices);
-                }
-            }
+            AABB aabb;
+            aabb.LowerBound = tsVector2_1;
+            aabb.UpperBound = tsVector2_2;
+            return aabb;
         }
 
         public void Translate(TSVector2 value)
@@ -375,22 +120,196 @@
         public void Translate(ref TSVector2 value)
         {
             Debug.Assert(!this.AttachedToBody, "Translating vertices that are used by a Body can result in unstable behavior. Use Body.Position instead.");
-            for (int i = 0; i < base.Count; i++)
+            for (int index = 0; index < this.Count; ++index)
+                this[index] = TSVector2.Add(this[index], value);
+            if (this.Holes == null || this.Holes.Count <= 0)
+                return;
+            foreach (Vertices hole in this.Holes)
+                hole.Translate(ref value);
+        }
+
+        public void Scale(TSVector2 value)
+        {
+            this.Scale(ref value);
+        }
+
+        public void Scale(ref TSVector2 value)
+        {
+            Debug.Assert(!this.AttachedToBody, "Scaling vertices that are used by a Body can result in unstable behavior.");
+            for (int index = 0; index < this.Count; ++index)
+                this[index] = TSVector2.Multiply(this[index], value);
+            if (this.Holes == null || this.Holes.Count <= 0)
+                return;
+            foreach (Vertices hole in this.Holes)
+                hole.Scale(ref value);
+        }
+
+        public void Rotate(FP value)
+        {
+            Debug.Assert(!this.AttachedToBody, "Rotating vertices that are used by a Body can result in unstable behavior.");
+            FP fp1 = FP.Cos(value);
+            FP fp2 = FP.Sin(value);
+            for (int index = 0; index < this.Count; ++index)
             {
-                base[i] = TSVector2.Add(base[i], value);
+                TSVector2 tsVector2 = this[index];
+                this[index] = new TSVector2(tsVector2.x * fp1 + tsVector2.y * -fp2, tsVector2.x * fp2 + tsVector2.y * fp1);
             }
-            if ((this.Holes != null) && (this.Holes.Count > 0))
+            if (this.Holes == null || this.Holes.Count <= 0)
+                return;
+            foreach (Vertices hole in this.Holes)
+                hole.Rotate(value);
+        }
+
+        public bool IsConvex()
+        {
+            if (this.Count < 3)
+                return false;
+            if (this.Count == 3)
+                return true;
+            for (int index1 = 0; index1 < this.Count; ++index1)
             {
-                foreach (Vertices vertices in this.Holes)
+                int index2 = index1 + 1 < this.Count ? index1 + 1 : 0;
+                TSVector2 tsVector2_1 = this[index2] - this[index1];
+                for (int index3 = 0; index3 < this.Count; ++index3)
                 {
-                    vertices.Translate(ref value);
+                    if (index3 != index1 && index3 != index2)
+                    {
+                        TSVector2 tsVector2_2 = this[index3] - this[index1];
+                        if (tsVector2_1.x * tsVector2_2.y - tsVector2_1.y * tsVector2_2.x <= (FP)0.0f)
+                            return false;
+                    }
                 }
+            }
+            return true;
+        }
+
+        public bool IsCounterClockWise()
+        {
+            if (this.Count < 3)
+                return false;
+            return this.GetSignedArea() > (FP)0.0f;
+        }
+
+        public void ForceCounterClockWise()
+        {
+            if (this.Count < 3 || this.IsCounterClockWise())
+                return;
+            this.Reverse();
+        }
+
+        public bool IsSimple()
+        {
+            if (this.Count < 3)
+                return false;
+            for (int index1 = 0; index1 < this.Count; ++index1)
+            {
+                TSVector2 a0 = this[index1];
+                TSVector2 a1 = this.NextVertex(index1);
+                for (int index2 = index1 + 1; index2 < this.Count; ++index2)
+                {
+                    TSVector2 b0 = this[index2];
+                    TSVector2 b1 = this.NextVertex(index2);
+                    TSVector2 intersectionPoint;
+                    if (LineTools.LineIntersect2(ref a0, ref a1, ref b0, ref b1, out intersectionPoint))
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        public PolygonError CheckPolygon()
+        {
+            if (this.Count < 3 || this.Count > Settings.MaxPolygonVertices)
+                return PolygonError.InvalidAmountOfVertices;
+            if (!this.IsSimple())
+                return PolygonError.NotSimple;
+            if (this.GetArea() <= Settings.Epsilon)
+                return PolygonError.AreaTooSmall;
+            if (!this.IsConvex())
+                return PolygonError.NotConvex;
+            for (int index = 0; index < this.Count; ++index)
+            {
+                if ((this[index + 1 < this.Count ? index + 1 : 0] - this[index]).LengthSquared() <= Settings.EpsilonSqr)
+                    return PolygonError.SideTooSmall;
+            }
+            return !this.IsCounterClockWise() ? PolygonError.NotCounterClockWise : PolygonError.NoError;
+        }
+
+        public void ProjectToAxis(ref TSVector2 axis, out FP min, out FP max)
+        {
+            FP fp1 = TSVector2.Dot(axis, this[0]);
+            min = fp1;
+            max = fp1;
+            for (int index = 0; index < this.Count; ++index)
+            {
+                FP fp2 = TSVector2.Dot(this[index], axis);
+                if (fp2 < min)
+                    min = fp2;
+                else if (fp2 > max)
+                    max = fp2;
             }
         }
 
-        internal bool AttachedToBody { get; set; }
+        public int PointInPolygon(ref TSVector2 point)
+        {
+            int num = 0;
+            for (int index = 0; index < this.Count; ++index)
+            {
+                TSVector2 a = this[index];
+                TSVector2 b = this[this.NextIndex(index)];
+                TSVector2 tsVector2 = b - a;
+                FP fp = MathUtils.Area(ref a, ref b, ref point);
+                if (fp == (FP)0.0f && TSVector2.Dot(point - a, tsVector2) >= (FP)0.0f && TSVector2.Dot(point - b, tsVector2) <= (FP)0.0f)
+                    return 0;
+                if (a.y <= point.y)
+                {
+                    if (b.y > point.y && fp > (FP)0.0f)
+                        ++num;
+                }
+                else if (b.y <= point.y && fp < (FP)0.0f)
+                    --num;
+            }
+            return num == 0 ? -1 : 1;
+        }
 
-        public List<Vertices> Holes { get; set; }
+        public bool PointInPolygonAngle(ref TSVector2 point)
+        {
+            FP fp = (FP)0;
+            for (int index = 0; index < this.Count; ++index)
+            {
+                TSVector2 p1 = this[index] - point;
+                TSVector2 p2 = this[this.NextIndex(index)] - point;
+                fp += MathUtils.VectorAngle(ref p1, ref p2);
+            }
+            return !(FP.Abs(fp) < FP.Pi);
+        }
+
+        public void Transform(ref Matrix transform)
+        {
+            for (int index = 0; index < this.Count; ++index)
+                this[index] = TSVector2.Transform(this[index], transform);
+            if (this.Holes == null || this.Holes.Count <= 0)
+                return;
+            for (int index1 = 0; index1 < this.Holes.Count; ++index1)
+            {
+                TSVector2[] array = this.Holes[index1].ToArray();
+                int index2 = 0;
+                for (int length = array.Length; index2 < length; ++index2)
+                    array[index2] = TSVector2.Transform(array[index2], transform);
+                this.Holes[index1] = new Vertices((IEnumerable<TSVector2>)array);
+            }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int index = 0; index < this.Count; ++index)
+            {
+                stringBuilder.Append(this[index].ToString());
+                if (index < this.Count - 1)
+                    stringBuilder.Append(" ");
+            }
+            return stringBuilder.ToString();
+        }
     }
 }
-

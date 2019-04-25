@@ -1,43 +1,96 @@
-﻿namespace TrueSync.Physics2D
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Runtime.CompilerServices;
-    using TrueSync;
+﻿// Decompiled with JetBrains decompiler
+// Type: TrueSync.Physics2D.GravityController
+// Assembly: TrueSync, Version=0.1.0.6, Culture=neutral, PublicKeyToken=null
+// MVID: 11931B28-7678-4A75-941C-C3C4D965272F
+// Assembly location: D:\Photon-TrueSync-Experiments\Assets\Plugins\TrueSync.dll
 
+using System.Collections.Generic;
+
+namespace TrueSync.Physics2D
+{
     public class GravityController : Controller
     {
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<Body> <Bodies>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private TrueSync.Physics2D.GravityType <GravityType>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <MaxRadius>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <MinRadius>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<TSVector2> <Points>k__BackingField;
-        [CompilerGenerated, DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private FP <Strength>k__BackingField;
-
-        public GravityController(FP strength) : base(ControllerType.GravityController)
+        public GravityController(FP strength)
+          : base(ControllerType.GravityController)
         {
             this.Strength = strength;
             this.MaxRadius = FP.MaxValue;
-            this.GravityType = TrueSync.Physics2D.GravityType.DistanceSquared;
+            this.GravityType = GravityType.DistanceSquared;
             this.Points = new List<TSVector2>();
             this.Bodies = new List<Body>();
         }
 
-        public GravityController(FP strength, FP maxRadius, FP minRadius) : base(ControllerType.GravityController)
+        public GravityController(FP strength, FP maxRadius, FP minRadius)
+          : base(ControllerType.GravityController)
         {
             this.MinRadius = minRadius;
             this.MaxRadius = maxRadius;
             this.Strength = strength;
-            this.GravityType = TrueSync.Physics2D.GravityType.DistanceSquared;
+            this.GravityType = GravityType.DistanceSquared;
             this.Points = new List<TSVector2>();
             this.Bodies = new List<Body>();
+        }
+
+        public FP MinRadius { get; set; }
+
+        public FP MaxRadius { get; set; }
+
+        public FP Strength { get; set; }
+
+        public GravityType GravityType { get; set; }
+
+        public List<Body> Bodies { get; set; }
+
+        public List<TSVector2> Points { get; set; }
+
+        public override void Update(FP dt)
+        {
+            TSVector2 force = TSVector2.zero;
+            foreach (Body body1 in this.World.BodyList)
+            {
+                if (this.IsActiveOn(body1))
+                {
+                    foreach (Body body2 in this.Bodies)
+                    {
+                        if (body1 != body2 && (!body1.IsStatic || !body2.IsStatic) && body2.Enabled)
+                        {
+                            TSVector2 tsVector2 = body2.Position - body1.Position;
+                            FP x = tsVector2.LengthSquared();
+                            if (!(x <= Settings.Epsilon) && !(x > this.MaxRadius * this.MaxRadius) && !(x < this.MinRadius * this.MinRadius))
+                            {
+                                switch (this.GravityType)
+                                {
+                                    case GravityType.Linear:
+                                        force = this.Strength / FP.Sqrt(x) * body1.Mass * body2.Mass * tsVector2;
+                                        break;
+                                    case GravityType.DistanceSquared:
+                                        force = this.Strength / x * body1.Mass * body2.Mass * tsVector2;
+                                        break;
+                                }
+                                body1.ApplyForce(ref force);
+                            }
+                        }
+                    }
+                    foreach (TSVector2 point in this.Points)
+                    {
+                        TSVector2 tsVector2 = point - body1.Position;
+                        FP x = tsVector2.LengthSquared();
+                        if (!(x <= Settings.Epsilon) && !(x > this.MaxRadius * this.MaxRadius) && !(x < this.MinRadius * this.MinRadius))
+                        {
+                            switch (this.GravityType)
+                            {
+                                case GravityType.Linear:
+                                    force = this.Strength / FP.Sqrt(x) * body1.Mass * tsVector2;
+                                    break;
+                                case GravityType.DistanceSquared:
+                                    force = this.Strength / x * body1.Mass * tsVector2;
+                                    break;
+                            }
+                            body1.ApplyForce(ref force);
+                        }
+                    }
+                }
+            }
         }
 
         public void AddBody(Body body)
@@ -49,71 +102,5 @@
         {
             this.Points.Add(point);
         }
-
-        public override void Update(FP dt)
-        {
-            TSVector2 zero = TSVector2.zero;
-            foreach (Body body in base.World.BodyList)
-            {
-                if (this.IsActiveOn(body))
-                {
-                    foreach (Body body2 in this.Bodies)
-                    {
-                        if (((body == body2) || (body.IsStatic && body2.IsStatic)) || !body2.Enabled)
-                        {
-                            continue;
-                        }
-                        TSVector2 vector2 = body2.Position - body.Position;
-                        FP x = vector2.LengthSquared();
-                        if (((x > Settings.Epsilon) && (x <= (this.MaxRadius * this.MaxRadius))) && (x >= (this.MinRadius * this.MinRadius)))
-                        {
-                            switch (this.GravityType)
-                            {
-                                case TrueSync.Physics2D.GravityType.Linear:
-                                    zero = (TSVector2) ((((this.Strength / FP.Sqrt(x)) * body.Mass) * body2.Mass) * vector2);
-                                    break;
-
-                                case TrueSync.Physics2D.GravityType.DistanceSquared:
-                                    zero = (TSVector2) ((((this.Strength / x) * body.Mass) * body2.Mass) * vector2);
-                                    break;
-                            }
-                            body.ApplyForce(ref zero);
-                        }
-                    }
-                    foreach (TSVector2 vector3 in this.Points)
-                    {
-                        TSVector2 vector4 = vector3 - body.Position;
-                        FP fp2 = vector4.LengthSquared();
-                        if (((fp2 > Settings.Epsilon) && (fp2 <= (this.MaxRadius * this.MaxRadius))) && (fp2 >= (this.MinRadius * this.MinRadius)))
-                        {
-                            switch (this.GravityType)
-                            {
-                                case TrueSync.Physics2D.GravityType.Linear:
-                                    zero = (TSVector2) (((this.Strength / FP.Sqrt(fp2)) * body.Mass) * vector4);
-                                    break;
-
-                                case TrueSync.Physics2D.GravityType.DistanceSquared:
-                                    zero = (TSVector2) (((this.Strength / fp2) * body.Mass) * vector4);
-                                    break;
-                            }
-                            body.ApplyForce(ref zero);
-                        }
-                    }
-                }
-            }
-        }
-
-        public List<Body> Bodies { get; set; }
-
-        public TrueSync.Physics2D.GravityType GravityType { get; set; }
-
-        public FP MaxRadius { get; set; }
-
-        public FP MinRadius { get; set; }
-
-        public List<TSVector2> Points { get; set; }
-
-        public FP Strength { get; set; }
     }
 }
-
