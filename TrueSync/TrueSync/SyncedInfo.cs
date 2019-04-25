@@ -1,0 +1,52 @@
+﻿namespace TrueSync
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
+    public class SyncedInfo
+    {
+        public string checksum;
+        private const int CHECKSUM_LENGTH = 0x20;
+        public byte playerId;
+        public int tick;
+
+        public SyncedInfo()
+        {
+        }
+
+        public SyncedInfo(byte playerId, int tick, string checksum)
+        {
+            this.tick = tick;
+            this.checksum = checksum;
+        }
+
+        public static SyncedInfo Decode(byte[] infoBytes)
+        {
+            SyncedInfo info = new SyncedInfo();
+            int startIndex = 0;
+            info.playerId = infoBytes[startIndex++];
+            if (startIndex < infoBytes.Length)
+            {
+                info.tick = BitConverter.ToInt32(infoBytes, startIndex);
+                startIndex += 4;
+                info.checksum = Encoding.ASCII.GetString(infoBytes, startIndex, 0x20);
+            }
+            return info;
+        }
+
+        public static byte[] Encode(SyncedInfo info)
+        {
+            List<byte> list = new List<byte> {
+                info.playerId
+            };
+            if (info.checksum > null)
+            {
+                list.AddRange(BitConverter.GetBytes(info.tick));
+                list.AddRange(Encoding.ASCII.GetBytes(info.checksum));
+            }
+            return list.ToArray();
+        }
+    }
+}
+
