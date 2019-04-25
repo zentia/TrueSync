@@ -1,0 +1,2 @@
+C:\Users\EDZ\source\repos\TrueSync\TrueSync\obj\x86\Debug\TrueSync.csprojAssemblyReference.cache
+C:\Users\EDZ\source\repos\TrueSync\TrueSync\obj\x86\Debug\TrueSync.csproj.CoreCompileInputs.cache
