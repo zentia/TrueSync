@@ -610,7 +610,7 @@ namespace TrueSync.Physics2D
                                 case JointType.Pulley:
                                     string lower4 = element3.Name.ToLower();
                                     // ISSUE: reference to a compiler-generated method
-                                    uint stringHash3 = \u003CPrivateImplementationDetails\u003E.ComputeStringHash(lower4);
+                                    uint stringHash3 = <CPrivateImplementationDetails>.ComputeStringHash(lower4);
                                     if (stringHash3 <= 2450411633U)
                                     {
                                         if (stringHash3 <= 110225957U)
@@ -685,7 +685,7 @@ namespace TrueSync.Physics2D
                                 case JointType.Wheel:
                                     string lower5 = element3.Name.ToLower();
                                     // ISSUE: reference to a compiler-generated method
-                                    uint stringHash4 = \u003CPrivateImplementationDetails\u003E.ComputeStringHash(lower5);
+                                    uint stringHash4 = <PrivateImplementationDetails>.compute;
                                     if (stringHash4 <= 2450411633U)
                                     {
                                         if (stringHash4 <= 1831579124U)
