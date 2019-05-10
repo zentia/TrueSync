@@ -55,7 +55,7 @@ namespace TrueSync
 				{
 					this.AddToActiveMultithreaded(this.bodyList[i], false);
 				}
-				this.threadManager.Execute();
+				threadManager.Execute();
 			}
 			else
 			{

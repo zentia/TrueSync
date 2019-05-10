@@ -64,7 +64,7 @@ namespace TrueSync
 						}
 					}
 				}
-				this.threadManager.Execute();
+				threadManager.Execute();
 			}
 			else
 			{

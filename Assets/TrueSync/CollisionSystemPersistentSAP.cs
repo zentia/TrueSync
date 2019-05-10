@@ -219,7 +219,7 @@ namespace TrueSync
 				this.threadManager.AddTask(this.sortCallback, this.axis1);
 				this.threadManager.AddTask(this.sortCallback, this.axis2);
 				this.threadManager.AddTask(this.sortCallback, this.axis3);
-				this.threadManager.Execute();
+				threadManager.Execute();
 			}
 			else
 			{
@@ -270,7 +270,7 @@ namespace TrueSync
 			}
 			if (multiThreaded)
 			{
-				this.threadManager.Execute();
+				threadManager.Execute();
 			}
 		}
 

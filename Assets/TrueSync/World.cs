@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace TrueSync
 {
@@ -11,72 +9,38 @@ namespace TrueSync
 
 		public class WorldEvents
 		{
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event World.WorldStep PreStep;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event World.WorldStep PostStep;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<RigidBody> AddedRigidBody;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<RigidBody> RemovedRigidBody;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<Constraint> AddedConstraint;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<Constraint> RemovedConstraint;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<SoftBody> AddedSoftBody;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<SoftBody> RemovedSoftBody;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<Contact> BodiesBeginCollide;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<Contact> BodiesStayCollide;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<RigidBody, RigidBody> BodiesEndCollide;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<Contact> TriggerBeginCollide;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<Contact> TriggerStayCollide;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<RigidBody, RigidBody> TriggerEndCollide;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<Contact> ContactCreated;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<RigidBody> DeactivatedBody;
 
-			[method: CompilerGenerated]
-			[DebuggerBrowsable(DebuggerBrowsableState.Never), CompilerGenerated]
 			public event Action<RigidBody> ActivatedBody;
 
 			internal WorldEvents()
@@ -220,7 +184,7 @@ namespace TrueSync
 
 			internal void RaiseDeactivatedBody(RigidBody body)
 			{
-				bool flag = this.DeactivatedBody != null;
+				bool flag = DeactivatedBody != null;
 				if (flag)
 				{
 					this.DeactivatedBody(body);
@@ -728,7 +692,7 @@ namespace TrueSync
 				this.CheckDeactivation();
 				this.IntegrateForces();
 				this.HandleArbiter(this.contactIterations, multithread);
-				this.Integrate(multithread);
+				Integrate(multithread);
 				int l = 0;
 				int count4 = this.rigidBodies.Count;
 				while (l < count4)
@@ -919,7 +883,7 @@ namespace TrueSync
 						this.threadManager.AddTask(this.arbiterCallback, this.islands[i]);
 					}
 				}
-				this.threadManager.Execute();
+				threadManager.Execute();
 			}
 			else
 			{
@@ -1024,11 +988,11 @@ namespace TrueSync
 					bool flag = rigidBody.isStatic || !rigidBody.IsActive;
 					if (!flag)
 					{
-						this.threadManager.AddTask(this.integrateCallback, rigidBody);
+						threadManager.AddTask(integrateCallback, rigidBody);
 					}
 					i++;
 				}
-				this.threadManager.Execute();
+				threadManager.Execute();
 			}
 			else
 			{
